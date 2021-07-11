@@ -77,7 +77,7 @@ class ClientFrame extends JFrame implements ActionListener, Runnable {
         // 在创建客户端窗体是就要把客户端与服务端连接
         try {
             // 127.0.0.1表示本机地址，地址好端口都可以改，这要看服务器那边是什么地址和端口
-            socket = new Socket("10.4.15.217", 6666);
+            socket = new Socket("127.0.0.1", 8808);
             os = socket.getOutputStream();
             bw = new BufferedWriter(new OutputStreamWriter(os));
 
