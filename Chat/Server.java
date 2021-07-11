@@ -78,7 +78,7 @@ class ServerFrame extends JFrame implements ActionListener, Runnable {
     /**
      * private类型的数据成员只能在定义的时候修改
      */
-    // 定义类型
+    // 声明对象
     private static final long serialVersionUID = 1L;
 
     private ServerSocket serverSocket = null;
@@ -90,18 +90,18 @@ class ServerFrame extends JFrame implements ActionListener, Runnable {
 
     // 服务端控制窗口界面生成
     public ServerFrame(String name) {
-        super(name);
+        super(name); // 子类中调用父类
 
-        start = new JButton("启动服务器");
-        start.addActionListener(this);
-        message = new JTextArea();
-        message.setEditable(false);
-        this.add(start, "North");
-        this.add(message, "Center");
+        start = new JButton("启动服务器"); // 生成带有“启动服务器”字样的按钮
+        start.addActionListener(this); // 添加动作侦听器，以接收发自此按钮的动作事件
+        message = new JTextArea(); // 创建文本框,用来显示用户上机情况
+        message.setEditable(false); // setEditable 复合框 false 内部选项的文本不可编辑组
+        this.add(start, "North"); // 设置启动服务器按钮的位置为最顶端
+        this.add(message, "Center"); // 设置文本框显示位置为中间
 
-        this.setResizable(false); // setEditable 复合框 false 内部选项的文本不可以编辑组
-        this.setBounds(0, 0, 400, 300); // setBounds(int x,int y,int width,int height) 用于设置窗口位置和尺寸
-        this.setVisible(true); // setEditable 复合框 true 内部选项的文本可以编辑组
+        this.setResizable(true); // setResizable 设置窗口是否预设(false)或可拖动(true)
+        this.setBounds(0, 0, 400, 300); // setBounds(int x,int y,int width,int height) 用于设置初始窗口位置和尺寸
+        this.setVisible(true); // 窗口显示
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 窗口可关闭,程序终止
     }
 
@@ -110,13 +110,13 @@ class ServerFrame extends JFrame implements ActionListener, Runnable {
         if (e.getSource() == start) {
             // 如果点击的按钮是开始按钮。则启动服务器。
             try {
-                serverSocket = new ServerSocket(8808);
-                message.setText("服务器已启动...");
+                serverSocket = new ServerSocket(8808); // 指定提供监听服务的端口是8808
+                message.setText("服务器已启动..."); // 在窗口打印
 
                 // 单击“启动服务器”开启一个线程用于获取用户上线的情况
-                new Thread(this).start();
+                new Thread(this).start(); // 调用类 Thread
 
-            } catch (IOException e1) {
+            } catch (IOException e1) { // 抛出异常
                 e1.printStackTrace();
             }
         }
@@ -128,17 +128,17 @@ class ServerFrame extends JFrame implements ActionListener, Runnable {
         String address = null; // 初始化address 用来记录客户端ip
         int port = 0;
         // 用一个死循环一直让S端开启接收C端的连接，将C端的IP和端口显示在面板上
-        // 如果用循环的话就只能接收一次
+        // 如果不用死循环的话就只能接收一次
         while (true) {
             try {
-                socket = serverSocket.accept();
+                socket = serverSocket.accept(); // ServerSocket的accept()方法从连接请求队列中取出一个客户的连接请求，然后创建与客户连接的Socket对象，并将它返回。如果队列中没有连接请求，accept()方法就会一直等待，直到接收到了连接请求才返回。
                 Server.list.add(socket);
                 address = socket.getInetAddress().getHostAddress(); // 返回InetAddress对象包含远程计算机的IP地址
                 port = socket.getPort(); // 获取请求
                 message.append("\r\nip:/" + address + ":" + port + "\t上线了");
-                System.out.println(port);
+                // System.out.println(port);
                 // 开启转发信息的线程
-                new sendThread(socket).start();
+                new sendThread(socket).start(); // 调用类 sendThread
 
             } catch (IOException e) {
             }
@@ -151,7 +151,7 @@ class ServerFrame extends JFrame implements ActionListener, Runnable {
  * Thread{} 开启多线程 ,并发接收每个C端的信息并向每个C端发送接收到的信息
  */
 class sendThread extends Thread {
-    private Socket socket;
+    private Socket socket; // 声明了一个 Socket类型的对象
 
     public sendThread(Socket socket) {
         super();
@@ -160,6 +160,7 @@ class sendThread extends Thread {
 
     @Override
     public void run() {
+        // 声明变量
         InputStream is = null;
         BufferedReader br = null;
         String str = null;
@@ -167,15 +168,15 @@ class sendThread extends Thread {
         BufferedWriter bw = null;
         while (true) {
             try {
-                is = socket.getInputStream();
-                br = new BufferedReader(new InputStreamReader(is));
-                str = br.readLine();
-                for (Socket s : Server.list) {
-                    os = s.getOutputStream();
-                    bw = new BufferedWriter(new OutputStreamWriter(os));
-                    bw.write(str);
-                    bw.newLine();
-                    bw.flush();
+                is = socket.getInputStream(); // 获取流程和子流程的输入流
+                br = new BufferedReader(new InputStreamReader(is)); // 缓冲字符输入流
+                str = br.readLine(); // 读取文件内容,如果读取不到数据的话，会一直阻塞
+                for (Socket s : Server.list) { // 如果服务器与客户端
+                    os = s.getOutputStream(); // 获取流程和子流程的输出流
+                    bw = new BufferedWriter(new OutputStreamWriter(os)); // 缓冲字符输出流
+                    bw.write(str); // 写入一行字符串
+                    bw.newLine(); // 换行
+                    bw.flush(); // 清空缓存
                 }
             } catch (IOException e) {
                 // 如果断开连接则移除对于的socket
